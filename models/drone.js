@@ -57,9 +57,9 @@ class Drone extends Model {
 
     async addMedication(medicationId, unitWeight, medicationQuantity) {
         try {
-            await Payload.addMedication(medicationId, unitWeight, this.id, medicationQuantity);
+            let currentDroneWeight = await Payload.addMedication(medicationId, unitWeight, this.id, medicationQuantity);
 
-            if (await this.getCurrentWeight() == this.weightLimit) {
+            if (currentDroneWeight == this.weightLimit) {
                 this.droneState = 'LOADED';
                 await this.save();
             } else if (this.droneState != 'IDLE') {
@@ -105,6 +105,25 @@ class Drone extends Model {
         } catch (err) {
             console.error("error occurred retrieving available drones %o", err);
             return [];
+        }
+    }
+
+    async removeMedication(medicationId, unitWeight, medicationQuantity) {
+        try {
+            let currentDroneWeight = await Payload.removeMedication(medicationId, this.id, medicationQuantity);
+
+            if (this.droneState != 'IDLE' && currentDroneWeight == 0) {
+                this.droneState = 'IDLE';
+                await this.save();
+            } else if (this.droneState == 'LOADED' && currentDroneWeight < this.weightLimit) {
+                this.droneState = 'LOADING';
+                await this.save();
+            }
+
+            return true;
+        } catch (err) {
+            console.error("Error occurred adding medication, %o", err);
+            throw err;
         }
     }
 }

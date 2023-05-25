@@ -61,10 +61,10 @@ class Payload extends Model {
                 });
             }
 
-            return;
+            return Payload.getDroneWeight(droneId);
         } catch (err) {
             console.error("error deleting payload, %o", err);
-            return;
+            throw err;
         }
 
     }
@@ -95,10 +95,10 @@ class Payload extends Model {
                 }
             }
 
-            return;
+            return Payload.getDroneWeight(droneId);
         } catch (err) {
             console.error("error deleting payload, %o", err);
-            return;
+            throw err;
         }
 
     }

@@ -45,7 +45,7 @@ module.exports = {
             if (drone.getBatteryLevel() < 25) {
                 return res.status(400).json({
                     error: true,
-                    message: 'drone battery is too low to take medications',
+                    message: 'drone is too low to take medications',
                 });
             }
 
@@ -73,9 +73,11 @@ module.exports = {
 
             await drone.addMedication(medication.id, medication.weight, body.medicationQuantity);
 
+            let droneItems = await drone.getMedications();
+
             return res.status(200).json({
                 error: false,
-                data: body,
+                data: droneItems,
             });
         } catch (err) {
             return res.status(400).json({
@@ -125,7 +127,7 @@ module.exports = {
                 });
             }
 
-            let droneItems = drone.getMedications();
+            let droneItems = await drone.getMedications();
             return res.status(200).json({
                 error: false,
                 data: droneItems,
@@ -155,5 +157,45 @@ module.exports = {
 
     startScheduledJobs: () => {
         cron.schedule("*/1 * * * *", Audit.logDroneBatteryLevels);
+    },
+
+    removeMedication: async (req, res) => {
+        const { body, params, } = req;
+        try {
+            const drone = await Drone.getBySerialNumber(params.sn);
+            if (drone == null) {
+                return res.status(400).json({
+                    error: true,
+                    message: 'drone not found',
+                });
+            }
+
+            if (!['IDLE', 'LOADING', 'LOADED'].includes(drone.droneState)) {
+                return res.status(400).json({
+                    error: true,
+                    message: 'drone is not available for removing medications',
+                });
+            }
+
+            const medication = await Medication.getMedicationByCode(body.medicationCode);
+            if (medication == null) {
+                return res.status(400).json({
+                    error: true,
+                    message: 'medication not found',
+                });
+            }
+
+            await drone.removeMedication(medication.id, body.medicationQuantity);
+
+            return res.status(200).json({
+                error: false,
+                data: await drone.getMedications(),
+            });
+        } catch (err) {
+            return res.status(400).json({
+                error: true,
+                data: err.message,
+            });
+        }
     },
 }
