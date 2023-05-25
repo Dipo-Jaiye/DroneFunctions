@@ -128,6 +128,31 @@ class Drone extends Model {
             throw err;
         }
     }
+
+    static async getMedicationItems(id) {
+        try {
+            let droneItems = await Drone.findAll({
+                where: {
+                    id: id,
+                },
+                attributes: [],
+                include: {
+                    model: Medication,
+                    attributes: ['name', 'code', 'weight', 'image'],
+                    through: {
+                        attributes: ['medicationWeight', 'medicationQuantity', 'createdAt', 'updatedAt'],
+                    },
+                },
+
+            });
+
+            return droneItems;
+        } catch (err) {
+            console.error("error occurred getting medication items, %o", err);
+            return [];
+        }
+
+    }
 }
 
 const sequelizeOptions = {

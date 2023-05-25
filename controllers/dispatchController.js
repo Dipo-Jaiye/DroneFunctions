@@ -10,7 +10,7 @@
 // check drone battery level, GET Drone/id
 
 // periodically check drone battery levels and create history/audit events
-const { Drone, Medication, Audit, } = require("../models");
+const { Drone, Medication, Audit, Payload, } = require("../models");
 const cron = require("node-cron");
 
 module.exports = {
@@ -73,7 +73,7 @@ module.exports = {
 
             await drone.addMedication(medication.id, medication.weight, body.medicationQuantity);
 
-            let droneItems = await drone.getMedications();
+            let droneItems = await Drone.getMedicationItems(drone.id);
 
             return res.status(200).json({
                 error: false,
@@ -127,7 +127,7 @@ module.exports = {
                 });
             }
 
-            let droneItems = await drone.getMedications();
+            let droneItems = await Drone.getMedicationItems(drone.id);
             return res.status(200).json({
                 error: false,
                 data: droneItems,
@@ -195,7 +195,7 @@ module.exports = {
 
             return res.status(200).json({
                 error: false,
-                data: await drone.getMedications(),
+                data: await Drone.getMedicationItems(drone.id),
             });
         } catch (err) {
             return res.status(400).json({
@@ -214,7 +214,7 @@ module.exports = {
         });
     },
 
-    notFoundError: (req,res) => {
+    notFoundError: (req, res) => {
         return res.status(401).json({
             error: true,
             message: 'route not found',
