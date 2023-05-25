@@ -10,6 +10,7 @@ router.get("/drones/available", dispatchCtrl.getAvailableDrones);
 router.get("/drone/:sn/batteryLevel", dispatchCtrl.getDroneBatteryLevel);
 router.get("/drone/:sn/items", dispatchCtrl.getDroneItems);
 router.post("/drones/audit", dispatchCtrl.takeAuditOfDrones);
+router.get("/medications/available", dispatchCtrl.getAvailableMedications);
 
 
 module.exports = router;

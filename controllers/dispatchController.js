@@ -26,7 +26,7 @@ module.exports = {
             console.error("error creating drone, %o", err);
             return res.status(400).json({
                 error: true,
-                message: err.message,
+                message: err?.errors?.reduce((a, x) => { return a += ' ' + x.message; }, '') ?? err.message,
             });
         }
     },
@@ -45,14 +45,14 @@ module.exports = {
             if (drone.getBatteryLevel() < 25) {
                 return res.status(400).json({
                     error: true,
-                    message: 'drone is too low to take medications',
+                    message: 'drone battery is too low to take medications',
                 });
             }
 
             if (!['IDLE', 'LOADING'].includes(drone.droneState)) {
                 return res.status(400).json({
                     error: true,
-                    message: 'drone battery is not available for receiving medications',
+                    message: 'drone is not available for receiving medications',
                 });
             }
 
@@ -126,8 +126,6 @@ module.exports = {
                     message: 'drone not found',
                 });
             }
-
-            console.log(drone);
 
             let droneItems = await drone.getMedications();
             return res.status(200).json({
@@ -206,4 +204,13 @@ module.exports = {
             });
         }
     },
+
+    getAvailableMedications: async (req, res) => {
+        const medications = await Medication.findAll();
+
+        return res.status(200).json({
+            error: false,
+            data: medications,
+        });
+    }
 }

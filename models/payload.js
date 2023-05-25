@@ -22,7 +22,7 @@ class Payload extends Model {
                 droneId: droneId,
             }
         });
-        return weight;
+        return weight == null ? 0 : weight;
     }
 
     static async addMedication(medicationId, unitWeight, droneId, count = 0) {

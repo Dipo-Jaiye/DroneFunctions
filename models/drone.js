@@ -64,7 +64,7 @@ class Drone extends Model {
             if (currentDroneWeight == this.weightLimit) {
                 this.droneState = 'LOADED';
                 await this.save();
-            } else if (this.droneState != 'IDLE') {
+            } else if (this.droneState == 'IDLE' && currentDroneWeight > 0) {
                 this.droneState = 'LOADING';
                 await this.save();
             }
@@ -110,7 +110,7 @@ class Drone extends Model {
         }
     }
 
-    async removeMedication(medicationId, unitWeight, medicationQuantity) {
+    async removeMedication(medicationId, medicationQuantity) {
         try {
             let currentDroneWeight = await Payload.removeMedication(medicationId, this.id, medicationQuantity);
 
