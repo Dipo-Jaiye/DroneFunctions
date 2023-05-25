@@ -10,7 +10,7 @@ const attributes = {
     name: {
         type: DataTypes.STRING,
         validate: {
-            is: ['[A-Za-z0-9_-]','i'],
+            is: ['[A-Za-z0-9_-]', 'i'],
         },
     },
     weight: {
@@ -19,7 +19,7 @@ const attributes = {
     code: {
         type: DataTypes.STRING,
         validate: {
-            is: ['[A-Z0-9_]','i'],
+            is: ['[A-Z0-9_]', 'i'],
         },
     },
     image: {
@@ -29,7 +29,22 @@ const attributes = {
 };
 
 class Medication extends Model {
+    static async getMedicationByCode(code) {
+        try {
+            const medication = await Medication.findOne({
+                where: {
+                    code: code,
+                }
+            });
 
+            return medication;
+        } catch (err) {
+            console.error("Error retrieving medications, %o", err);
+            return null;
+        }
+
+
+    }
 }
 
 const sequelizeOptions = {
