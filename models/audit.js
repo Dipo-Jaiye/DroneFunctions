@@ -11,7 +11,7 @@ const attributes = {
     droneId: {
         type: DataTypes.INTEGER,
         references: {
-            model: 'Drone'
+            model: 'Drones'
         },
         allowNull: false,
     },
@@ -29,7 +29,9 @@ class Audit extends Model {
                 attributes: [['id', 'droneId'], ['batteryCapacity', 'batteryLevel']],
             });
 
-            const audits = await Audit.bulkCreate(drones);
+            const audits = await Audit.bulkCreate(drones.map(x => x.get()));
+
+            console.log("audit log performed, %o", new Date().toISOString());
 
             return;
         } catch (err) {

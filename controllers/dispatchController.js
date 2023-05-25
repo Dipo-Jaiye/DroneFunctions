@@ -10,7 +10,8 @@
 // check drone battery level, GET Drone/id
 
 // periodically check drone battery levels and create history/audit events
-const { Drone, Medication, } = require("../models");
+const { Drone, Medication, Audit, } = require("../models");
+const cron = require("node-cron");
 
 module.exports = {
     createDrone: async (req, res) => {
@@ -150,5 +151,9 @@ module.exports = {
                 message: err.message,
             });
         }
-    }
+    },
+
+    startScheduledJobs: () => {
+        cron.schedule("*/1 * * * *", Audit.logDroneBatteryLevels);
+    },
 }
