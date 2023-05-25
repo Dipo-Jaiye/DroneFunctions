@@ -1,5 +1,6 @@
 const { DataTypes, Model, } = require('sequelize');
 const { dbInstance, } = require("../db");
+const Payload = require("./payload");
 
 const attributes = {
     id: {
@@ -24,7 +25,7 @@ const attributes = {
             max:500,
         }
     },
-    batteryCapacitiy: {
+    batteryCapacity: {
         type: DataTypes.INTEGER,
         defaultValue: 100,
         validate: {
@@ -40,23 +41,76 @@ const attributes = {
 };
 
 class Drone extends Model {
-    addMedication(){
 
+    async getBySerialNumber(serial){
+        return await Drone.findOne({
+            where:{
+                serialNumber: serial,
+            }
+        }).then(drone => {
+            return drone;
+        }).catch(err => {
+            console.error("err retrieving drone %o", err);
+            return null;
+        });
     }
 
-    removeMedication(){
+    async addMedication(medication){
+        try {
+            await Payload.create({
+                droneId: this.id,
+                medicationId: medication.id,
+                medicationWeight: medication.weight,
+            });
 
+            if (await this.getCurrentWeight() == this.weightLimit){
+                this.droneState = 'LOADED';
+                await this.save();
+            } else if(this.droneState != 'IDLE')
+            {
+                this.droneState = 'LOADING';
+                await this.save();
+            }
+
+            return true;
+        } catch (err) {
+            console.error("Error occurred adding medication, %o", err);
+            throw err;
+        }
     }
 
-    getCurrentWeight(){
-
+    async getCurrentWeight(){
+        return await Payload.getDroneWeight(this.id);
     }
 
-    canTakeMedication(){
-
+    async canTakeMedication(weight){
+        let currentDroneWeight = await this.getCurrentWeight();
+        return (currentDroneWeight != this.weightLimit) && (currentDroneWeight + weight <= this.weightLimit);
     }
 
     getBatteryLevel(){
+        return this.batteryCapacity;
+    }
+
+    static async getAvailableDrones(){
+        try {
+            const drones = await Drone.findAll({
+                where: {
+                    droneState: 'IDLE',
+                    batteryLevel: {
+                        gte: 25,
+                    }
+                }
+            });
+
+            return drones;
+        } catch (err) {
+            console.error("error occurred retrieving available drones %o", err);
+            return [];
+        }
+    }
+
+    getDroneItems(){
 
     }
 }
