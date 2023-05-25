@@ -212,5 +212,19 @@ module.exports = {
             error: false,
             data: medications,
         });
+    },
+
+    notFoundError: (req,res) => {
+        return res.status(401).json({
+            error: true,
+            message: 'route not found',
+        });
+    },
+
+    errorHandler: (req, res, next, err) => {
+        return res.status(400).json({
+            error: true,
+            message: (err.message != undefined && err.message != null && err.message != '') ? err.message : 'server error occurred',
+        })
     }
 }
