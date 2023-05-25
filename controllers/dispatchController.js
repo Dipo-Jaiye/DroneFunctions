@@ -31,9 +31,9 @@ module.exports = {
     },
 
     addMedication: async (req, res) => {
-        const { body, } = req;
+        const { body, params, } = req;
         try {
-            const drone = await Drone.getBySerialNumber(body.droneSN);
+            const drone = await Drone.getBySerialNumber(params.sn);
             if (drone == null) {
                 return res.status(400).json({
                     error: true,
@@ -48,7 +48,14 @@ module.exports = {
                 });
             }
 
-            const medication = await Medication.findByPk(body.medicationId);
+            if (!['IDLE', 'LOADING'].includes(drone.droneState)) {
+                return res.status(400).json({
+                    error: true,
+                    message: 'drone battery is not available for receiving medications',
+                });
+            }
+
+            const medication = await Medication.getMedicationByCode(body.medicationCode);
             if (medication == null) {
                 return res.status(400).json({
                     error: true,
@@ -56,14 +63,14 @@ module.exports = {
                 });
             }
 
-            if (!await drone.canTakeMedication(medication.weight)) {
+            if (!await drone.canTakeMedication(medication.weight * body.medicationQuantity)) {
                 return res.status(400).json({
                     error: true,
                     message: 'medication is too heavy for this drone',
                 });
             }
 
-            await drone.addMedication(medication);
+            await drone.addMedication(medication.id, medication.weight, body.medicationQuantity);
 
             return res.status(200).json({
                 error: false,
@@ -129,4 +136,19 @@ module.exports = {
             });
         }
     },
+
+    takeAuditOfDrones: async (req, res) => {
+        try {
+            await Audit.logDroneBatteryLevels();
+            return res.status(200).json({
+                error: false,
+            });
+        } catch (err) {
+            console.error(err);
+            return res.status(400).json({
+                error: true,
+                message: err.message,
+            });
+        }
+    }
 }
