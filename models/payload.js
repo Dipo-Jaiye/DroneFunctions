@@ -10,14 +10,14 @@ const attributes = {
     droneId: {
         type: DataTypes.INTEGER,
         references: {
-            model: 'Drone'
+            model: 'Drones'
         },
         allowNull: false,
     },
     medicationId: {
         type: DataTypes.INTEGER,
         references: {
-            model: 'Medication'
+            model: 'Medications'
         },
         allowNull: false,
     },
