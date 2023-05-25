@@ -9,7 +9,6 @@ app.use(routes);
 
 startDb()
     .then(async res => {
-        console.log(res);
         // start the server
         app.listen(3000, () => console.log(`App running on port:${3000}`));
     })

@@ -1,0 +1,106 @@
+{
+    "drones": [
+        {
+            "serialNumber": "DR01",
+            "modelType": "Lightweight",
+            "weightLimit": 200,
+            "batteryCapacity": 100,
+            "droneState": "IDLE"
+        },
+        {
+            "serialNumber": "DR02",
+            "modelType": "Lightweight",
+            "weightLimit": 200,
+            "batteryCapacity": 100,
+            "droneState": "IDLE"
+        },
+        {
+            "serialNumber": "DR03",
+            "modelType": "Lightweight",
+            "weightLimit": 200,
+            "batteryCapacity": 100,
+            "droneState": "IDLE"
+        },
+        {
+            "serialNumber": "DR04",
+            "modelType": "Middleweight",
+            "weightLimit": 300,
+            "batteryCapacity": 100,
+            "droneState": "IDLE"
+        },
+        {
+            "serialNumber": "DR05",
+            "modelType": "Middleweight",
+            "weightLimit": 300,
+            "batteryCapacity": 100,
+            "droneState": "IDLE"
+        },
+        {
+            "serialNumber": "DR06",
+            "modelType": "Cruiserweight",
+            "weightLimit": 400,
+            "batteryCapacity": 100,
+            "droneState": "IDLE"
+        },
+        {
+            "serialNumber": "DR07",
+            "modelType": "Cruiserweight",
+            "weightLimit": 400,
+            "batteryCapacity": 100,
+            "droneState": "IDLE"
+        },
+        {
+            "serialNumber": "DR08",
+            "modelType": "Cruiserweight",
+            "weightLimit": 400,
+            "batteryCapacity": 100,
+            "droneState": "IDLE"
+        },
+        {
+            "serialNumber": "DR09",
+            "modelType": "Heavyweight",
+            "weightLimit": 500,
+            "batteryCapacity": 100,
+            "droneState": "IDLE"
+        },
+        {
+            "serialNumber": "DR10",
+            "modelType": "Heavyweight",
+            "weightLimit": 500,
+            "batteryCapacity": 100,
+            "droneState": "IDLE"
+        }
+    ],
+    "medications": [
+        {
+            "name":"Fansidar",
+            "weight": 20,
+            "code": "ANT_MAL_01",
+            "image": "https://google.com"
+        },
+        {
+            "name":"Arthemether",
+            "weight": 30,
+            "code": "ANT_MAL_07",
+            "image": "https://google.com"
+        },
+        {
+            "name":"Valium",
+            "weight": 50,
+            "code": "SLP_MED_356",
+            "image": "https://google.com"
+        },
+        {
+            "name":"Ibuprofen",
+            "weight": 15,
+            "code": "ACHE_KILL_01",
+            "image": "https://google.com"
+        },
+        {
+            "name":"Cannabis",
+            "weight": 35,
+            "code": "WEED_001",
+            "image": "https://google.com"
+        }
+    ]
+}
