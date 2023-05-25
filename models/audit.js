@@ -1,19 +1,11 @@
 const { DataTypes, Model, } = require("sequelize");
-const { dbInstance } = require("../db");
-const Drone = require("./drone");
+const { dbInstance, } = require("../db");
 
 const attributes = {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-    },
-    droneId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: 'Drones'
-        },
-        allowNull: false,
     },
     batteryLevel: {
         type: DataTypes.INTEGER,
@@ -23,12 +15,8 @@ const attributes = {
 };
 
 class Audit extends Model {
-    static async logDroneBatteryLevels() {
+    static async logDroneBatteryLevels(drones) {
         try {
-            const drones = await Drone.findAll({
-                attributes: [['id', 'droneId'], ['batteryCapacity', 'batteryLevel']],
-            });
-
             const audits = await Audit.bulkCreate(drones.map(x => x.get()));
 
             console.log("audit log performed, %o", new Date().toISOString());

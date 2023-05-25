@@ -7,20 +7,6 @@ const attributes = {
         autoIncrement: true,
         primaryKey: true,
     },
-    droneId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: 'Drones'
-        },
-        allowNull: false,
-    },
-    medicationId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: 'Medications'
-        },
-        allowNull: false,
-    },
     medicationWeight: {
         type: DataTypes.INTEGER,
     },

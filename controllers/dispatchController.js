@@ -127,6 +127,8 @@ module.exports = {
                 });
             }
 
+            console.log(drone);
+
             let droneItems = await drone.getMedications();
             return res.status(200).json({
                 error: false,
@@ -156,7 +158,13 @@ module.exports = {
     },
 
     startScheduledJobs: () => {
-        cron.schedule("*/1 * * * *", Audit.logDroneBatteryLevels);
+        cron.schedule("*/1 * * * *", async () => {
+            const drones = await Drone.findAll({
+                attributes: [['id', 'droneId'], ['batteryCapacity', 'batteryLevel']],
+            });
+
+            await Audit.logDroneBatteryLevels(drones);
+        });
     },
 
     removeMedication: async (req, res) => {

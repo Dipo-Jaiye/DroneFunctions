@@ -1,6 +1,8 @@
 const { DataTypes, Model, Op, } = require('sequelize');
 const { dbInstance, } = require("../db");
 const Payload = require("./payload");
+const Audit = require("./audit");
+const Medication = require("./medication");
 
 const attributes = {
     id: {
@@ -42,7 +44,7 @@ const attributes = {
 
 class Drone extends Model {
 
-    async getBySerialNumber(serial) {
+    static async getBySerialNumber(serial) {
         return await Drone.findOne({
             where: {
                 serialNumber: serial,
@@ -95,8 +97,8 @@ class Drone extends Model {
                         { droneState: 'IDLE' },
                         { droneState: 'LOADING' }
                     ],
-                    batteryLevel: {
-                        gte: 25,
+                    batteryCapacity: {
+                        [Op.gte]: 25,
                     }
                 }
             });
@@ -133,5 +135,11 @@ const sequelizeOptions = {
 }
 
 Drone.init(attributes, sequelizeOptions);
+
+Drone.hasMany(Audit, {
+    foreignKey: 'droneId',
+});
+
+Drone.belongsToMany(Medication, { through: Payload, foreignKey: 'droneId', otherKey: 'medicationId', });
 
 module.exports = Drone;
