@@ -156,7 +156,8 @@ module.exports = {
     },
 
     startScheduledJobs: () => {
-        cron.schedule("*/1 * * * *", async () => {
+        const cronString = '*/10 * * * *'; // every 10 minutes
+        cron.schedule(cronString, async () => {
             const drones = await Drone.findAll({
                 attributes: [['id', 'droneId'], ['batteryCapacity', 'batteryLevel']],
             });
@@ -193,9 +194,11 @@ module.exports = {
 
             await drone.removeMedication(medication.id, body.medicationQuantity);
 
+            const droneItems = await Drone.getMedicationItems(drone.id)
+
             return res.status(200).json({
                 error: false,
-                data: await Drone.getMedicationItems(drone.id),
+                data: droneItems,
             });
         } catch (err) {
             return res.status(400).json({

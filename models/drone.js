@@ -131,7 +131,7 @@ class Drone extends Model {
 
     static async getMedicationItems(id) {
         try {
-            let droneItems = await Drone.findAll({
+            let droneItems = await Drone.findOne({
                 where: {
                     id: id,
                 },
@@ -146,7 +146,11 @@ class Drone extends Model {
 
             });
 
-            return droneItems;
+            if (droneItems == null || droneItems?.Medications == null) {
+                return [];
+            }
+
+            return droneItems.Medications;
         } catch (err) {
             console.error("error occurred getting medication items, %o", err);
             return [];

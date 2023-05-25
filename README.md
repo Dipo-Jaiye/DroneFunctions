@@ -6,6 +6,14 @@ leapfrog traditional transportation infrastructure.
 Useful drone functions include the delivery of small items that are (urgently) needed in
 locations with difficult access.
 
+- [Introduction](#introduction)
+- [Task description](#task-description)
+- [Functional Requirements](#functional-requirements)
+- [Non Functional Requirements](#non-functional-requirements)
+- [Installation](#installation-procedures)
+- [Extra additions](#extra-additions)
+- [Postman collection for testing locally](#postman-link)
+
 ### Task description
 We have a fleet of **10 drones**. A drone is capable of carrying devices, other than
 cameras, and capable of delivering small loads. For our use case **the load is
@@ -40,8 +48,7 @@ While implementing your solution **please take care of the following requirement
 - There is no need for UI;
 - Prevent the drone from being loaded with more weight that it can carry;
 - Prevent the drone from being in LOADING state if the battery level is **below 25%**;
-- Introduce a periodic task to check drones battery levels and create history/audit event
-log for this.
+- Introduce a periodic task to check drones battery levels and create history/audit event log for this.
 
 #### Non-functional requirements
 - Input/output data must be in JSON format;
@@ -52,3 +59,35 @@ be run locally, e.g. in-memory, via container);
 - Unit tests are optional but advisable (if you have time);
 - Advice: Show us how you work through your commit history.
 - Programming Language: (Node.js Typescript optional) or Java
+
+### Installation Procedures
+#### Clone the project
+```bash
+    git clone <this-repo-url>
+```
+
+#### install the packages from npm
+```bash
+    npm install
+```
+
+#### start the application
+```bash
+    npm start
+```
+The API will be available locally on port 3000. <br>
+
+If the port is not available, the value can be changed via the port variable in the app.js file on line 5.
+```node
+  const port = 3000;
+```
+
+### Extra Additions
+ - The audit log is triggerred every 10 minutes.
+
+ - When a drone is loaded, a background service simulates the drone moving to it's destination, dropping its payload and returning, all in 30 minutes. While losing battery level constantly.
+
+- A drone automatically charges once in an idle state and battery is 10% or less.
+
+### Postman link
+The collection of endpoints for testing this API can be found [here](https://documenter.getpostman.com/view/16059391/2s93m63NtQ)

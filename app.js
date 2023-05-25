@@ -2,6 +2,7 @@ const express = require("express");
 const { connect: startDb, } = require("./db");
 const routes = require("./routes");
 const {startScheduledJobs,} = require("./controllers/dispatchController");
+const port = 3000;
 
 const app = express();
 
@@ -13,7 +14,7 @@ startDb()
         // schedule background jobs
         startScheduledJobs();
         // start the server
-        app.listen(3000, () => console.log(`App running on port:${3000}`));
+        app.listen(port, () => console.log(`App running on port:${port}`));
     })
     .catch(err => {
         console.error(err);
