@@ -1,4 +1,4 @@
-const {Model, DataTypes,} = require('sequelize');
+const { Model, DataTypes, } = require('sequelize');
 const { dbInstance } = require('../db');
 
 const attributes = {
@@ -22,12 +22,15 @@ const attributes = {
         allowNull: false,
     },
     medicationWeight: {
-        type: DataTypes.INTEGER, 
-    }
+        type: DataTypes.INTEGER,
+    },
+    medicationQuantity: {
+        type: DataTypes.INTEGER,
+    },
 };
 
 class Payload extends Model {
-    static async getDroneWeight(droneId){
+    static async getDroneWeight(droneId) {
         const weight = await Payload.sum('medicationWeight', {
             where: {
                 droneId: droneId,
@@ -36,23 +39,71 @@ class Payload extends Model {
         return weight;
     }
 
-    static async removeMedication(medicationId) {
+    static async addMedication(medicationId, unitWeight, droneId, count = 0) {
         try {
-            const payload = await Payload.destroy({
+            const payload = await Payload.findOne({
                 where: {
                     medicationId: medicationId,
+                    droneId: droneId,
                 }
             });
-    
+
+            if (payload != null) {
+                payload.medicationQuantity += count;
+                payload.medicationWeight = payload.medicationQuantity * unitWeight;
+                await payload.save();
+            } else if (payload == null && count > 0) {
+                await Payload.create({
+                    droneId: droneId,
+                    medicationId: medicationId,
+                    medicationQuantity: count,
+                    medicationWeight: count * unitWeight,
+                });
+            }
+
             return;
         } catch (err) {
             console.error("error deleting payload, %o", err);
             return;
         }
-        
+
     }
 
-    static async getDronePayload(droneId){
+    static async removeMedication(medicationId, droneId, count = 0) {
+        try {
+            const payload = await Payload.findOne({
+                where: {
+                    medicationId: medicationId,
+                    droneId: droneId,
+                }
+            });
+
+            if (payload != null) {
+                if (count != 0) {
+                    let unitWeight = payload.medicationWeight / payload.medicationQuantity;
+                    payload.medicationQuantity -= count;
+                    if (payload.medicationQuantity < 0) {
+                        payload.medicationQuantity = 0;
+                    }
+                    payload.medicationWeight = payload.medicationQuantity * unitWeight;
+                }
+
+                if (count == 0 || payload.medicationWeight == 0) {
+                    await payload.destroy();
+                } else {
+                    await payload.save();
+                }
+            }
+
+            return;
+        } catch (err) {
+            console.error("error deleting payload, %o", err);
+            return;
+        }
+
+    }
+
+    static async getDronePayload(droneId) {
         try {
             const payload = await Payload.findAll({
                 where: {
