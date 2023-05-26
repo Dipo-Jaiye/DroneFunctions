@@ -55,8 +55,18 @@ class Payload extends Model {
 
     }
 
-    static async removeMedication(medicationId, droneId, count = 0) {
+    static async removeMedication(medicationId = null, droneId = null, count = 0) {
         try {
+            if (medicationId == null && droneId != null){
+                await Payload.destroy({
+                    where: {
+                        droneId: droneId,
+                    }
+                });
+
+                return Payload.getDroneWeight(droneId);
+            }
+            
             const payload = await Payload.findOne({
                 where: {
                     medicationId: medicationId,

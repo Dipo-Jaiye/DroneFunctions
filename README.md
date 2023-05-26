@@ -83,11 +83,11 @@ If the port is not available, the value can be changed via the port variable in 
 ```
 
 ### Extra Additions
- - The audit log is triggerred every 10 minutes.
+ - The audit log is triggered every 10 minutes.
 
- - When a drone is loaded, a background service simulates the drone moving to it's destination, dropping its payload and returning, all in 30 minutes. While losing battery level constantly.
+ - When a drone is loaded, a background service simulates the drone moving to it's destination, dropping its payload and returning. While losing battery level constantly.
 
-- A drone automatically charges once in an idle state and battery is 10% or less.
+- A drone automatically charges once in an idle state (simulated by a background service).
 
 ### Postman link
 The collection of endpoints for testing this API can be found [here](https://documenter.getpostman.com/view/16059391/2s93m63NtQ)

@@ -164,6 +164,20 @@ module.exports = {
 
             await Audit.logDroneBatteryLevels(drones);
         });
+
+        const moveDroneString = '*/5 * * * *'; // every 5 minutes
+        cron.schedule(moveDroneString, Drone.startDeliveryOfLoadedDrones);
+
+        const otherCronString = '*/10 * * * *'; // every 10 minutes
+        cron.schedule(otherCronString, Drone.markDroneAsDelivered);
+
+        cron.schedule(moveDroneString, Drone.moveDeliveredDronesBackToSource);
+
+        cron.schedule(otherCronString, Drone.setReturnedDronesToIdle);
+
+        const drainBatteryCron = '*/2 * * * *'; // every 2 minutes
+        cron.schedule(drainBatteryCron, Drone.drainBatteryWhenDroneInMotion);
+        cron.schedule(drainBatteryCron, Drone.chargeBatteryWhenDroneIsIdle);
     },
 
     removeMedication: async (req, res) => {
@@ -229,5 +243,5 @@ module.exports = {
             error: true,
             message: (err.message != undefined && err.message != null && err.message != '') ? err.message : 'server error occurred',
         })
-    }
+    },
 }

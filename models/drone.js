@@ -110,11 +110,16 @@ class Drone extends Model {
         }
     }
 
-    async removeMedication(medicationId, medicationQuantity) {
+    async removeMedication(medicationId = null, medicationQuantity = 0) {
         try {
+            if (medicationId == null) {
+                await Payload.removeMedication(null, this.id);
+                return true;
+            }
+
             let currentDroneWeight = await Payload.removeMedication(medicationId, this.id, medicationQuantity);
 
-            if (this.droneState != 'IDLE' && currentDroneWeight == 0) {
+            if ((this.droneState == 'LOADING' || this.droneState == 'LOADED') && currentDroneWeight == 0) {
                 this.droneState = 'IDLE';
                 await this.save();
             } else if (this.droneState == 'LOADED' && currentDroneWeight < this.weightLimit) {
@@ -156,6 +161,110 @@ class Drone extends Model {
             return [];
         }
 
+    }
+
+    static async startDeliveryOfLoadedDrones() {
+        try {
+            await Drone.update({ droneState: 'DELIVERING' }, {
+                where: {
+                    droneState: 'LOADED',
+                    batteryCapacity: {
+                        [Op.gte]: 25
+                    }
+                },
+            });
+        } catch (err) {
+            console.error("error updating loaded drones, %o", err);
+        }
+    }
+
+    static async markDroneAsDelivered() {
+        try {
+            await Drone.update({ droneState: 'DELIVERED' }, {
+                where: {
+                    droneState: 'DELIVERING',
+                    batteryCapacity: {
+                        [Op.gte]: 0
+                    }
+                },
+            });
+        } catch (err) {
+            console.error("error updating delivering drones, %o", err);
+        }
+    }
+
+    static async moveDeliveredDronesBackToSource() {
+        try {
+            let deliveredDrones = await Drone.findAll({
+                where: {
+                    droneState: 'DELIVERED',
+                }
+            });
+
+            for (let drone in deliveredDrones) {
+                await drone.removeMedication();
+            }
+
+            await Drone.update({ droneState: 'RETURNING' }, {
+                where: {
+                    droneState: 'DELIVERED',
+                    batteryCapacity: {
+                        [Op.gte]: 0
+                    }
+                },
+            });
+        } catch (err) {
+            console.error("error updating delivered drones, %o", err);
+        }
+    }
+
+    static async setReturnedDronesToIdle() {
+        try {
+            await Drone.update({ droneState: 'IDLE' }, {
+                where: {
+                    droneState: 'RETURNING',
+                    batteryCapacity: {
+                        [Op.gte]: 0
+                    }
+                },
+            });
+        } catch (err) {
+            console.error("error updating returning drones, %o", err);
+        }
+    }
+
+    static async drainBatteryWhenDroneInMotion() {
+        try {
+            await Drone.decrement({ batteryCapacity: 5 }, {
+                where: {
+                    [Op.or]: [
+                        { droneState: 'DELIVERING' },
+                        { droneState: 'DELIVERED' },
+                        { droneState: 'RETURNING' },
+                    ],
+                    batteryCapacity: {
+                        [Op.gte]: 5,
+                    },
+                },
+            });
+        } catch (err) {
+            console.error("error reducing drone battery, %o", err);
+        }
+    }
+
+    static async chargeBatteryWhenDroneIsIdle() {
+        try {
+            await Drone.increment({ batteryCapacity: 10 }, {
+                where: {
+                    droneState: 'IDLE',
+                    batteryCapacity: {
+                        [Op.lte]: 90,
+                    }
+                },
+            });
+        } catch (err) {
+            console.error("error charging drone battery, %o", err);
+        }
     }
 }
 
