@@ -165,7 +165,7 @@ class Drone extends Model {
 
     static async startDeliveryOfLoadedDrones() {
         try {
-            await Drone.update({ droneState: 'DELIVERING' }, {
+            let result = await Drone.update({ droneState: 'DELIVERING' }, {
                 where: {
                     droneState: 'LOADED',
                     batteryCapacity: {
@@ -173,6 +173,9 @@ class Drone extends Model {
                     }
                 },
             });
+            if (result[0] > 0){
+                console.log("%o delivering..", result[0]);
+            }
         } catch (err) {
             console.error("error updating loaded drones, %o", err);
         }
@@ -180,7 +183,7 @@ class Drone extends Model {
 
     static async markDroneAsDelivered() {
         try {
-            await Drone.update({ droneState: 'DELIVERED' }, {
+            let result = await Drone.update({ droneState: 'DELIVERED' }, {
                 where: {
                     droneState: 'DELIVERING',
                     batteryCapacity: {
@@ -188,6 +191,9 @@ class Drone extends Model {
                     }
                 },
             });
+            if (result[0] > 0){
+                console.log("%o delivered..", result[0]);
+            }
         } catch (err) {
             console.error("error updating delivering drones, %o", err);
         }
@@ -205,7 +211,7 @@ class Drone extends Model {
                 await drone.removeMedication();
             }
 
-            await Drone.update({ droneState: 'RETURNING' }, {
+            let result = await Drone.update({ droneState: 'RETURNING' }, {
                 where: {
                     droneState: 'DELIVERED',
                     batteryCapacity: {
@@ -213,6 +219,10 @@ class Drone extends Model {
                     }
                 },
             });
+
+            if (result[0] > 0){
+                console.log("%o returning..", result[0]);
+            }
         } catch (err) {
             console.error("error updating delivered drones, %o", err);
         }
@@ -220,7 +230,7 @@ class Drone extends Model {
 
     static async setReturnedDronesToIdle() {
         try {
-            await Drone.update({ droneState: 'IDLE' }, {
+            let result = await Drone.update({ droneState: 'IDLE' }, {
                 where: {
                     droneState: 'RETURNING',
                     batteryCapacity: {
@@ -228,6 +238,9 @@ class Drone extends Model {
                     }
                 },
             });
+            if (result[0] > 0){
+                console.log("%o going to idle..", result[0]);
+            }
         } catch (err) {
             console.error("error updating returning drones, %o", err);
         }
@@ -235,7 +248,7 @@ class Drone extends Model {
 
     static async drainBatteryWhenDroneInMotion() {
         try {
-            await Drone.decrement({ batteryCapacity: 5 }, {
+            let result = await Drone.decrement({ batteryCapacity: 5 }, {
                 where: {
                     [Op.or]: [
                         { droneState: 'DELIVERING' },
@@ -247,6 +260,9 @@ class Drone extends Model {
                     },
                 },
             });
+            if (result[0] > 0){
+                console.log("%o discharging..", result[0]);
+            }
         } catch (err) {
             console.error("error reducing drone battery, %o", err);
         }
@@ -254,7 +270,7 @@ class Drone extends Model {
 
     static async chargeBatteryWhenDroneIsIdle() {
         try {
-            await Drone.increment({ batteryCapacity: 10 }, {
+            let result = await Drone.increment({ batteryCapacity: 10 }, {
                 where: {
                     droneState: 'IDLE',
                     batteryCapacity: {
@@ -262,6 +278,9 @@ class Drone extends Model {
                     }
                 },
             });
+            if (result[0] > 0){
+                console.log("%o charging..", result[0]);
+            }
         } catch (err) {
             console.error("error charging drone battery, %o", err);
         }
